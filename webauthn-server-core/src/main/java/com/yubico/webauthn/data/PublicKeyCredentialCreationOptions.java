@@ -371,6 +371,10 @@ public class PublicKeyCredentialCreationOptions {
                 param -> {
                   try {
                     switch (param.getAlg()) {
+                      case DILITHIUM3:
+                        KeyFactory.getInstance("DILITHIUM3");
+                        break;
+
                       case EdDSA:
                         KeyFactory.getInstance("EdDSA");
                         break;
@@ -401,6 +405,10 @@ public class PublicKeyCredentialCreationOptions {
 
                   try {
                     switch (param.getAlg()) {
+                      case DILITHIUM3:
+                        Signature.getInstance("DILITHIUM3");
+                        break;
+
                       case EdDSA:
                         Signature.getInstance("EDDSA");
                         break;

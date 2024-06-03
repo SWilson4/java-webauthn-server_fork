@@ -208,6 +208,7 @@ public class RelyingParty {
    * <p>The default is the following list, in order:
    *
    * <ol>
+   *   <li>{@link com.yubico.webauthn.data.PublicKeyCredentialParameters#DILITHIUM3 DILITHIUM3}
    *   <li>{@link com.yubico.webauthn.data.PublicKeyCredentialParameters#ES256 ES256}
    *   <li>{@link com.yubico.webauthn.data.PublicKeyCredentialParameters#EdDSA EdDSA}
    *   <li>{@link com.yubico.webauthn.data.PublicKeyCredentialParameters#ES256 ES384}
@@ -225,6 +226,7 @@ public class RelyingParty {
   private final List<PublicKeyCredentialParameters> preferredPubkeyParams =
       Collections.unmodifiableList(
           Arrays.asList(
+              PublicKeyCredentialParameters.DILITHIUM3,
               PublicKeyCredentialParameters.ES256,
               PublicKeyCredentialParameters.EdDSA,
               PublicKeyCredentialParameters.ES384,
@@ -415,6 +417,10 @@ public class RelyingParty {
                 param -> {
                   try {
                     switch (param.getAlg()) {
+                      case DILITHIUM3:
+                        KeyFactory.getInstance("DILITHIUM3");
+                        break;
+
                       case EdDSA:
                         KeyFactory.getInstance("EdDSA");
                         break;

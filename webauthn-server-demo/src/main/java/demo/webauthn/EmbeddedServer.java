@@ -25,6 +25,7 @@
 package demo.webauthn;
 
 import demo.App;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.HttpConfiguration;
@@ -40,6 +41,8 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 
+import java.security.Security;
+
 /**
  * Standalone Java application launcher that runs the demo server with the API but no static
  * resources (i.e., no web GUI)
@@ -47,6 +50,7 @@ import org.glassfish.jersey.servlet.ServletContainer;
 public class EmbeddedServer {
 
   public static void main(String[] args) throws Exception {
+    Security.addProvider(new BouncyCastleProvider());
     final int port = Config.getPort();
 
     App app = new App();

@@ -59,6 +59,13 @@ public class PublicKeyCredentialParameters {
   }
 
   /**
+   * Algorithm {@link COSEAlgorithmIdentifier#DILITHIUM3} and type {@link
+   * PublicKeyCredentialType#PUBLIC_KEY}.
+   */
+  public static final PublicKeyCredentialParameters DILITHIUM3 =
+      builder().alg(COSEAlgorithmIdentifier.DILITHIUM3).build();
+
+  /**
    * Algorithm {@link COSEAlgorithmIdentifier#EdDSA} and type {@link
    * PublicKeyCredentialType#PUBLIC_KEY}.
    */

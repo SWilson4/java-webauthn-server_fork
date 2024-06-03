@@ -22,6 +22,7 @@ dependencies {
   implementation("com.upokecenter:cbor")
   implementation("org.apache.httpcomponents.client5:httpclient5")
   implementation("org.slf4j:slf4j-api")
+  implementation("org.bouncycastle:bcprov-jdk18on:[1.72,1.77)")
 
   testImplementation(platform(project(":test-platform")))
   testImplementation(project(":yubico-util-scala"))

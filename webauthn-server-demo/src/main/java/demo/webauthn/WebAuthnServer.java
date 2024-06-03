@@ -187,12 +187,13 @@ public class WebAuthnServer {
     this.registerRequestStorage = registerRequestStorage;
     this.assertRequestStorage = assertRequestStorage;
 
+    // We use INDIRECT to test self-attestation for PQC.
     rp =
         RelyingParty.builder()
             .identity(rpIdentity)
             .credentialRepository(this.userStorage)
             .origins(origins)
-            .attestationConveyancePreference(Optional.of(AttestationConveyancePreference.DIRECT))
+            .attestationConveyancePreference(Optional.of(AttestationConveyancePreference.INDIRECT))
             .attestationTrustSource(metadataService)
             .allowOriginPort(false)
             .allowOriginSubdomain(false)

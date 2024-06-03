@@ -30,6 +30,10 @@ import com.google.common.primitives.Bytes;
 import com.upokecenter.cbor.CBORObject;
 import com.yubico.webauthn.data.ByteArray;
 import com.yubico.webauthn.data.COSEAlgorithmIdentifier;
+import org.bouncycastle.pqc.crypto.crystals.dilithium.DilithiumParameters;
+import org.bouncycastle.pqc.crypto.crystals.dilithium.DilithiumPublicKeyParameters;
+import org.bouncycastle.pqc.jcajce.provider.util.KeyUtil;
+
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.KeyFactory;
@@ -133,9 +137,20 @@ final class WebAuthnCodecs {
       case 3:
         // COSE-JAVA supports RSA in v1.1.0 but not in v1.0.0
         return importCoseRsaPublicKey(cose);
+      case 5:
+        return importCoseDilithiumPublicKey(cose);
       default:
         throw new IllegalArgumentException("Unsupported key type: " + kty);
     }
+  }
+
+  private static PublicKey importCoseDilithiumPublicKey(CBORObject cose)
+     throws NoSuchAlgorithmException, InvalidKeySpecException {
+    // first, get the raw key
+    byte[] rawKey = cose.get(CBORObject.FromObject(-2)).GetByteString();
+    // TODO: support more parameter sets
+    byte[] encoded = KeyUtil.getEncodedSubjectPublicKeyInfo(new DilithiumPublicKeyParameters(DilithiumParameters.dilithium3, rawKey));
+    return KeyFactory.getInstance("DILITHIUM").generatePublic(new X509EncodedKeySpec(encoded));
   }
 
   private static PublicKey importCoseRsaPublicKey(CBORObject cose)
@@ -177,6 +192,8 @@ final class WebAuthnCodecs {
 
   static String getJavaAlgorithmName(COSEAlgorithmIdentifier alg) {
     switch (alg) {
+      case DILITHIUM3:
+        return "DILITHIUM3";
       case EdDSA:
         return "EDDSA";
       case ES256:
