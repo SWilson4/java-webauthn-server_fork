@@ -61,6 +61,20 @@ let ceremonyState = {};
 let session = {
 };
 
+// copied from https://developer.mozilla.org/en-US/docs/Web/API/PerformanceObserver
+function perfObserver(list, observer) {
+  list.getEntries().forEach((entry) => {
+    if (entry.entryType === "mark") {
+      console.log(`BENCH ${entry.name} ${entry.startTime + performance.timeOrigin}`);
+    }
+    if (entry.entryType === "measure") {
+      console.log(`${entry.name}'s duration: ${entry.duration}`);
+    }
+  });
+}
+const observer = new PerformanceObserver(perfObserver);
+observer.observe({ entryTypes: ["measure", "mark"] });
+
 function extend(obj, more) {
   return Object.assign({}, obj, more);
 }
@@ -266,6 +280,7 @@ async function performCeremony(params) {
   const statusStrings = params.statusStrings; /* { init, authenticatorRequest, serverRequest, success, } */
   const executeRequest = params.executeRequest; /* function({ publicKeyCredentialCreationOptions: object } | { publicKeyCredentialRequestOptions: object }): Promise[PublicKeyCredential] */
   const handleError = params.handleError; /* function(err): ? */
+  const benchmarkEnd = params.benchmarkEnd;
 
   setStatus('Looking up API paths...');
   resetDisplays();
@@ -292,6 +307,8 @@ async function performCeremony(params) {
 
   const webauthnResponse = await executeRequest(request);
   const serverResponse = await finishCeremony(webauthnResponse);
+
+  benchmarkEnd();
 
   return serverResponse;
 }
@@ -324,6 +341,10 @@ function registerResidentKey(event) {
   return register(event, true);
 }
 async function register(event, requireResidentKey) {
+  let benchmarkEnd = () => {
+    performance.mark("reg_success");
+  }
+  performance.mark("reg_start");
   const username = document.getElementById('username').value;
   const displayName = document.getElementById('displayName').value;
   const credentialNickname = document.getElementById('credentialNickname').value;
@@ -343,6 +364,7 @@ async function register(event, requireResidentKey) {
         request = req;
         return executeRegisterRequest(req);
       },
+      benchmarkEnd: benchmarkEnd,
     });
 
     if (data.registration) {
@@ -408,6 +430,10 @@ function authenticateWithUsername(event) {
   return authenticate(event, document.getElementById('username').value);
 }
 async function authenticate(event, username) {
+  let benchmarkEnd = () => {
+    performance.mark("auth_success");
+  }
+  performance.mark("auth_start");
   try {
     const data = await performCeremony({
       getIndexActions,
@@ -418,6 +444,7 @@ async function authenticate(event, username) {
         success: 'Authentication successful!',
       },
       executeRequest: executeAuthenticateRequest,
+      benchmarkEnd: benchmarkEnd,
     });
 
     if (data.registrations) {
